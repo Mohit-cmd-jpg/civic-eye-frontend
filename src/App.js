@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 
+const BACKEND_URL = "https://civic-eye-backend-tnsa.onrender.com";
+
 function App() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch reports
+  // Load reports from backend
   const loadReports = () => {
-    fetch("http://localhost:5000/reports")
+    fetch(`${BACKEND_URL}/reports`)
       .then((res) => res.json())
       .then((data) => {
         setReports(data);
@@ -24,14 +26,16 @@ function App() {
 
   // Update report status
   const updateStatus = (id, status) => {
-    fetch(`http://localhost:5000/reports/${id}/status`, {
+    fetch(`${BACKEND_URL}/reports/${id}/status`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ status })
     })
       .then((res) => res.json())
       .then(() => {
-        loadReports(); // refresh table
+        loadReports();
       })
       .catch((err) => {
         console.error("Error updating status:", err);
@@ -39,34 +43,43 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>Civic-Eye Moderation Dashboard</h1>
-      <p>Authorities can update report status in real time.</p>
-
-      <hr />
+    <div style={{ padding: "24px", fontFamily: "Arial, sans-serif" }}>
+      <h1 style={{ marginBottom: "4px" }}>Civic-Eye Moderation Dashboard</h1>
+      <p style={{ color: "#555", marginBottom: "20px" }}>
+        AI-verified civic issue reports for authority action
+      </p>
 
       {loading ? (
         <p>Loading reports...</p>
       ) : reports.length === 0 ? (
         <p>No reports available.</p>
       ) : (
-        <table border="1" cellPadding="8" width="100%">
+        <table
+          width="100%"
+          cellPadding="10"
+          style={{ borderCollapse: "collapse" }}
+        >
           <thead>
-            <tr>
-              <th>Issue Type</th>
-              <th>Trust</th>
-              <th>Priority</th>
-              <th>Status</th>
-              <th>Action</th>
-              <th>Created At</th>
+            <tr style={{ backgroundColor: "#f3f3f3" }}>
+              <th align="left">Issue</th>
+              <th align="left">Trust</th>
+              <th align="left">Priority</th>
+              <th align="left">Status</th>
+              <th align="left">Action</th>
+              <th align="left">Reported At</th>
             </tr>
           </thead>
           <tbody>
             {reports.map((r) => (
-              <tr key={r._id}>
+              <tr
+                key={r._id}
+                style={{ borderBottom: "1px solid #ddd" }}
+              >
                 <td>{r.issue_type}</td>
                 <td>{r.trust_score}</td>
-                <td>{r.priority}</td>
+                <td>
+                  <b>{r.priority}</b>
+                </td>
                 <td>{r.status}</td>
                 <td>
                   <select
