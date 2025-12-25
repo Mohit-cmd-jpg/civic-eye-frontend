@@ -25,13 +25,12 @@ function Dashboard() {
         body: JSON.stringify({ status: newStatus })
       });
 
-      // Update UI immediately (no reload)
       setReports((prev) =>
         prev.map((r) =>
           r._id === id ? { ...r, status: newStatus } : r
         )
       );
-    } catch (err) {
+    } catch {
       alert("Failed to update status");
     }
   };
@@ -51,7 +50,8 @@ function Dashboard() {
           <thead>
             <tr>
               <th>Issue</th>
-              <th>Trust Score</th>
+              <th>Description</th>
+              <th>Trust</th>
               <th>Priority</th>
               <th>Status</th>
             </tr>
@@ -60,6 +60,9 @@ function Dashboard() {
             {reports.map((r) => (
               <tr key={r._id}>
                 <td>{r.issue_type}</td>
+                <td style={styles.desc}>
+                  {r.description || "—"}
+                </td>
                 <td>{r.trust_score}</td>
                 <td>
                   <span style={priorityStyle(r.priority)}>
@@ -92,16 +95,17 @@ const styles = {
     width: "100%",
     borderCollapse: "collapse",
     marginTop: "20px"
+  },
+  desc: {
+    maxWidth: "300px",
+    whiteSpace: "pre-wrap",
+    fontSize: "14px"
   }
 };
 
 const priorityStyle = (priority) => {
-  if (priority === "HIGH") {
-    return { color: "red", fontWeight: "bold" };
-  }
-  if (priority === "MEDIUM") {
-    return { color: "orange", fontWeight: "bold" };
-  }
+  if (priority === "HIGH") return { color: "red", fontWeight: "bold" };
+  if (priority === "MEDIUM") return { color: "orange", fontWeight: "bold" };
   return { color: "green", fontWeight: "bold" };
 };
 
