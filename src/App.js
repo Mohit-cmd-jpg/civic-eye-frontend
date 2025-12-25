@@ -1,108 +1,125 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const BACKEND_URL = "https://civic-eye-backend-tnsa.onrender.com";
 
 function App() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState(null);
+  const [issueType, setIssueType] = useState("road_block");
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Load reports from backend
-  const loadReports = () => {
-    fetch(`${BACKEND_URL}/reports`)
-      .then((res) => res.json())
-      .then((data) => {
-        setReports(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching reports:", err);
-        setLoading(false);
+  const submitReport = async () => {
+    if (!image) {
+      setStatus("Please select an image.");
+      return;
+    }
+
+    setLoading(true);
+    setStatus("");
+
+    const formData = new FormData();
+    formData.append("image", image);
+    formData.append("issue_type", issueType);
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/upload`, {
+        method: "POST",
+        body: formData
       });
-  };
 
-  useEffect(() => {
-    loadReports();
-  }, []);
+      const data = await response.json();
 
-  // Update report status
-  const updateStatus = (id, status) => {
-    fetch(`${BACKEND_URL}/reports/${id}/status`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ status })
-    })
-      .then((res) => res.json())
-      .then(() => {
-        loadReports();
-      })
-      .catch((err) => {
-        console.error("Error updating status:", err);
-      });
+      if (response.ok) {
+        setStatus("✅ Report submitted successfully!");
+      } else {
+        setStatus("❌ Submission failed. Please try again.");
+      }
+    } catch (error) {
+      setStatus("❌ Server error. Please try later.");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: "24px", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ marginBottom: "4px" }}>Civic-Eye Moderation Dashboard</h1>
-      <p style={{ color: "#555", marginBottom: "20px" }}>
-        AI-verified civic issue reports for authority action
+    <div style={styles.container}>
+      <h1 style={styles.title}>Civic-Eye</h1>
+      <p style={styles.subtitle}>
+        Report civic issues in your area with photo proof
       </p>
 
-      {loading ? (
-        <p>Loading reports...</p>
-      ) : reports.length === 0 ? (
-        <p>No reports available.</p>
-      ) : (
-        <table
-          width="100%"
-          cellPadding="10"
-          style={{ borderCollapse: "collapse" }}
+      <div style={styles.card}>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) => setImage(e.target.files[0])}
+        />
+
+        <select
+          value={issueType}
+          onChange={(e) => setIssueType(e.target.value)}
+          style={styles.select}
         >
-          <thead>
-            <tr style={{ backgroundColor: "#f3f3f3" }}>
-              <th align="left">Issue</th>
-              <th align="left">Trust</th>
-              <th align="left">Priority</th>
-              <th align="left">Status</th>
-              <th align="left">Action</th>
-              <th align="left">Reported At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.map((r) => (
-              <tr
-                key={r._id}
-                style={{ borderBottom: "1px solid #ddd" }}
-              >
-                <td>{r.issue_type}</td>
-                <td>{r.trust_score}</td>
-                <td>
-                  <b>{r.priority}</b>
-                </td>
-                <td>{r.status}</td>
-                <td>
-                  <select
-                    value={r.status}
-                    onChange={(e) =>
-                      updateStatus(r._id, e.target.value)
-                    }
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Resolved">Resolved</option>
-                  </select>
-                </td>
-                <td>
-                  {new Date(r.created_at).toLocaleString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          <option value="road_block">Road Block</option>
+          <option value="pothole">Pothole</option>
+          <option value="garbage">Garbage</option>
+          <option value="accident">Accident</option>
+        </select>
+
+        <button onClick={submitReport} style={styles.button}>
+          {loading ? "Submitting..." : "Submit Report"}
+        </button>
+
+        {status && <p style={styles.status}>{status}</p>}
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    minHeight: "100vh",
+    backgroundColor: "#f4f6f8",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily: "Arial, sans-serif"
+  },
+  title: {
+    fontSize: "36px",
+    marginBottom: "4px"
+  },
+  subtitle: {
+    color: "#555",
+    marginBottom: "24px"
+  },
+  card: {
+    background: "#fff",
+    padding: "24px",
+    borderRadius: "8px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    width: "320px",
+    textAlign: "center"
+  },
+  select: {
+    width: "100%",
+    marginTop: "12px",
+    padding: "8px"
+  },
+  button: {
+    marginTop: "16px",
+    width: "100%",
+    padding: "10px",
+    backgroundColor: "#2b7cff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer"
+  },
+  status: {
+    marginTop: "12px"
+  }
+};
 
 export default App;
