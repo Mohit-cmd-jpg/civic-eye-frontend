@@ -5,6 +5,7 @@ const BACKEND_URL = "https://civic-eye-backend-tnsa.onrender.com";
 function CitizenPage() {
   const [image, setImage] = useState(null);
   const [issueType, setIssueType] = useState("road_block");
+  const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,6 +21,7 @@ function CitizenPage() {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("issue_type", issueType);
+    formData.append("description", description);
 
     try {
       const response = await fetch(`${BACKEND_URL}/upload`, {
@@ -30,10 +32,11 @@ function CitizenPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setStatus(`❌ ${data.message}`);
+        setStatus(`❌ ${data.message || "Submission failed"}`);
       } else {
         setStatus("✅ Report submitted successfully!");
         setImage(null);
+        setDescription("");
       }
     } catch {
       setStatus("❌ Server error. Please retry.");
@@ -64,6 +67,13 @@ function CitizenPage() {
           <option value="accident">Accident</option>
         </select>
 
+        <textarea
+          placeholder="Describe the issue (optional but helpful)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          style={styles.textarea}
+        />
+
         <button onClick={submitReport} disabled={loading}>
           {loading ? "Submitting..." : "Submit Report"}
         </button>
@@ -83,7 +93,14 @@ const styles = {
     display: "inline-block",
     padding: "20px",
     border: "1px solid #ddd",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    width: "320px"
+  },
+  textarea: {
+    width: "100%",
+    height: "80px",
+    marginTop: "10px",
+    padding: "8px"
   }
 };
 
