@@ -10,7 +10,7 @@ function App() {
 
   const submitReport = async () => {
     if (!image) {
-      setStatus("Please select an image.");
+      setStatus("❌ Please select an image.");
       return;
     }
 
@@ -27,14 +27,23 @@ function App() {
         body: formData
       });
 
-      if (response.ok) {
+      const text = await response.text();
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error("Server returned invalid response.");
+      }
+
+      if (!response.ok) {
+        setStatus(`❌ ${data.message || "Submission failed."}`);
+      } else {
         setStatus("✅ Report submitted successfully!");
         setImage(null);
-      } else {
-        setStatus("❌ Submission failed. Please try again.");
       }
     } catch (error) {
-      setStatus("❌ Server error. Please try later.");
+      setStatus(`❌ ${error.message}`);
     }
 
     setLoading(false);
@@ -121,7 +130,8 @@ const styles = {
     cursor: "pointer"
   },
   status: {
-    marginTop: "12px"
+    marginTop: "12px",
+    fontWeight: "bold"
   }
 };
 
