@@ -27,10 +27,9 @@ function App() {
         body: formData
       });
 
-      const data = await response.json();
-
       if (response.ok) {
         setStatus("✅ Report submitted successfully!");
+        setImage(null);
       } else {
         setStatus("❌ Submission failed. Please try again.");
       }
@@ -66,7 +65,11 @@ function App() {
           <option value="accident">Accident</option>
         </select>
 
-        <button onClick={submitReport} style={styles.button}>
+        <button
+          onClick={submitReport}
+          style={styles.button}
+          disabled={loading}
+        >
           {loading ? "Submitting..." : "Submit Report"}
         </button>
 
