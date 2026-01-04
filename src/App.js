@@ -1,36 +1,28 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import CitizenPage from "./CitizenPage";
-import Dashboard from "./Dashboard";
+import { Routes, Route, Navigate } from "react-router-dom";
+import ReportPage from "./pages/ReportPage";
+import TrackComplaint from "./pages/TrackComplaint";
+import LoginPage from "./pages/LoginPage";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <>
-      <nav style={styles.nav}>
-        <Link to="/" style={styles.link}>Report Issue</Link>
-        <Link to="/dashboard" style={styles.link}>Authority Dashboard</Link>
-      </nav>
-
-      <Routes>
-        <Route path="/" element={<CitizenPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Routes>
-    </>
+    <Routes>
+      <Route path="/" element={<ReportPage />} />
+      <Route path="/track" element={<TrackComplaint />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
-
-const styles = {
-  nav: {
-    padding: "12px",
-    backgroundColor: "#1f2937",
-    display: "flex",
-    gap: "16px"
-  },
-  link: {
-    color: "#fff",
-    textDecoration: "none",
-    fontWeight: "bold"
-  }
-};
 
 export default App;
