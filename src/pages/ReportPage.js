@@ -11,6 +11,8 @@ function ReportPage() {
   const [description, setDescription] = useState("");
   const [pincode, setPincode] = useState("");
   const [address, setAddress] = useState("");
+  const [userDate, setUserDate] = useState(new Date().toISOString().split("T")[0]);
+  const [userTime, setUserTime] = useState(new Date().toTimeString().split(" ")[0].substring(0, 5));
   const [location, setLocation] = useState({ lat: null, lng: null, error: null });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -88,6 +90,8 @@ function ReportPage() {
     formData.append("description", description);
     formData.append("pincode", pincode.trim());
     formData.append("address", address.trim());
+    formData.append("user_date", userDate);
+    formData.append("user_time", userTime);
     
     if (location.lat && location.lng) {
       formData.append("latitude", location.lat.toString());
@@ -194,6 +198,30 @@ function ReportPage() {
                   </div>
                 </label>
               )}
+            </div>
+          </div>
+
+          {/* Date and Time */}
+          <div className="form-row" style={{ display: 'flex', gap: '1rem' }}>
+            <div className="form-group half" style={{ flex: 1 }}>
+              <label className="form-label">📅 Date *</label>
+              <input
+                type="date"
+                value={userDate}
+                onChange={(e) => setUserDate(e.target.value)}
+                className="form-input"
+                required
+              />
+            </div>
+            <div className="form-group half" style={{ flex: 1 }}>
+              <label className="form-label">⏰ Time *</label>
+              <input
+                type="time"
+                value={userTime}
+                onChange={(e) => setUserTime(e.target.value)}
+                className="form-input"
+                required
+              />
             </div>
           </div>
 
