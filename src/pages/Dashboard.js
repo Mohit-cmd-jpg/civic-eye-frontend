@@ -20,6 +20,7 @@ function Dashboard() {
   });
 
   const [verifying, setVerifying] = useState(null);
+  const [deleting, setDeleting] = useState(null);
   const [authority, setAuthority] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -130,6 +131,36 @@ function Dashboard() {
       alert("❌ AI verification failed. Is the AI service running?");
     } finally {
       setVerifying(null);
+    }
+  };
+
+  const handleDelete = async (reportId) => {
+    if (!window.confirm("Are you sure you want to delete this report? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeleting(reportId);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${API_BASE}/api/reports/${reportId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        // Remove from UI
+        setReports(reports.filter(r => r._id !== reportId));
+        alert(`✅ ${data.message}`);
+      } else {
+        alert(`❌ ${data.message}`);
+      }
+    } catch (err) {
+      alert("❌ Failed to delete report");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -381,11 +412,11 @@ function Dashboard() {
                     )}
                   </div>
 
-                  <div className="mt-auto pt-4 border-t border-gray-100">
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2">
                     <button
                       onClick={() => handleVerify(report._id)}
                       disabled={verifying === report._id}
-                      className="w-full bg-white border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors font-medium flex items-center justify-center gap-2"
+                      className="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 hover:text-blue-600 transition-colors font-medium flex items-center justify-center gap-2"
                     >
                       {verifying === report._id ? (
                         <>
@@ -403,6 +434,23 @@ function Dashboard() {
                           Verify with AI
                         </>
                       )}
+                    </button>
+                    <button
+                      onClick={() => handleDelete(report._id)}
+                      disabled={deleting === report._id}
+                      className="p-2 bg-white border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors flex items-center justify-center"
+                      title="Delete Report"
+                    >
+                       {deleting === report._id ? (
+                        <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                       ) : (
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                       )}
                     </button>
                   </div>
                 </div>
