@@ -410,6 +410,16 @@ function Dashboard() {
                         </span>
                       </div>
                     )}
+                    {report.base_severity !== undefined && report.base_severity !== null && (
+                      <div className="flex items-center mt-1">
+                        <svg className="h-4 w-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span className="font-semibold text-gray-700">
+                          Severity: {Number(report.base_severity).toFixed(1)}%
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-auto pt-4 border-t border-gray-100 flex gap-2">

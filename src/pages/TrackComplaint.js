@@ -177,6 +177,34 @@ function TrackComplaint() {
                       </div>
                     </div>
 
+                    {complaint.base_severity !== undefined && complaint.base_severity !== null && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 mb-1">Severity Score</h3>
+                        <div className="flex items-center text-gray-900 font-semibold text-lg">
+                          <span className="p-2 bg-red-50 rounded-lg mr-3 text-red-600">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                          </span>
+                          {Number(complaint.base_severity).toFixed(1)}%
+                        </div>
+                      </div>
+                    )}
+
+                    {complaint.trust_score !== undefined && complaint.trust_score !== null && (
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500 mb-1">Trust Score</h3>
+                        <div className="flex items-center text-gray-900 font-semibold text-lg">
+                          <span className="p-2 bg-green-50 rounded-lg mr-3 text-green-600">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </span>
+                          {Number(complaint.trust_score).toFixed(1)}%
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <h3 className="text-sm font-medium text-gray-500 mb-1">Location</h3>
                       <div className="flex flex-col text-gray-900">
